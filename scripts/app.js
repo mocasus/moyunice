@@ -72,7 +72,7 @@
       li.dataset.id = d.id;
       if (activeDayId === d.id) li.classList.add('active');
       li.innerHTML = `
-        <span class="dot" style="background:${escapeAttr(d.color || '#0f7a3a')}"></span>
+        <span class="dot" style="background:${escapeAttr(d.color || '#f5b800')}"></span>
         <span class="day-name">${escapeHtml(d.name)}</span>
         <span class="count">${courseCount}</span>
         <span class="day-actions">
@@ -127,7 +127,7 @@
       const col = document.createElement('div');
       col.className = 'day-column' + (isToday ? ' is-today' : '');
       col.dataset.dayId = d.id;
-      col.style.setProperty('--day-accent', d.color || '#0f7a3a');
+      col.style.setProperty('--day-accent', d.color || '#f5b800');
       col.innerHTML = `
         <div class="day-column-head">
           <div class="day-column-title">
@@ -179,7 +179,7 @@
     card.draggable = true;
     card.dataset.id = c.id;
     card.dataset.dayId = c.dayId;
-    card.style.setProperty('--course-accent', c.color || '#0f7a3a');
+    card.style.setProperty('--course-accent', c.color || '#f5b800');
 
     const time = (c.start || c.end) ? `${c.start || '--:--'} – ${c.end || '--:--'}` : '';
     const chips = [];
@@ -386,7 +386,7 @@
     f.reset();
     if (day) {
       f.name.value = day.name || '';
-      f.color.value = day.color || '#0f7a3a';
+      f.color.value = day.color || '#f5b800';
       $('#dayModalTitle').textContent = 'Ubah Hari';
     } else {
       $('#dayModalTitle').textContent = 'Tambah Hari';
@@ -398,7 +398,7 @@
     ev.preventDefault();
     const fd = new FormData(ev.target);
     const name = String(fd.get('name') || '').trim();
-    const color = String(fd.get('color') || '#0f7a3a');
+    const color = String(fd.get('color') || '#f5b800');
     if (!name) return;
     if (editingDay) {
       const d = data.days.find(d => d.id === editingDay.id);
@@ -450,12 +450,12 @@
       f.start.value = course.start || '';
       f.end.value = course.end || '';
       f.room.value = course.room || '';
-      f.color.value = course.color || '#0f7a3a';
+      f.color.value = course.color || '#f5b800';
       f.note.value = course.note || '';
       f.dayId.value = course.dayId;
       $('#courseModalTitle').textContent = 'Ubah Mata Kuliah';
     } else {
-      f.color.value = '#0f7a3a';
+      f.color.value = '#f5b800';
       f.dayId.value = dayId || data.days[0].id;
       $('#courseModalTitle').textContent = 'Tambah Mata Kuliah';
     }
@@ -471,7 +471,7 @@
       start: String(fd.get('start') || ''),
       end: String(fd.get('end') || ''),
       room: String(fd.get('room') || '').trim(),
-      color: String(fd.get('color') || '#0f7a3a'),
+      color: String(fd.get('color') || '#f5b800'),
       note: String(fd.get('note') || '').trim(),
       dayId: String(fd.get('dayId') || ''),
     };

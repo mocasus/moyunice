@@ -17,7 +17,7 @@
   /** Default seed: hari Senin-Jumat dengan beberapa contoh agar tidak kosong di first-run */
   function defaultData() {
     const dayNames = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
-    const palette = ['#0f7a3a', '#2aa55a', '#1f8fbf', '#b07a1a', '#a23a8a'];
+    const palette = ['#f5b800', '#e0a300', '#b07d00', '#ffcf3d', '#7a4b00'];
     const days = dayNames.map((n, i) => ({
       id: uid('day'),
       name: n,
@@ -34,7 +34,7 @@
         room: 'E5-101',
         start: '08:00',
         end: '10:30',
-        color: '#0f7a3a',
+        color: '#f5b800',
         note: 'Bawa laptop & charger.',
         order: 0,
       },
@@ -46,7 +46,7 @@
         room: 'D3-204',
         start: '13:00',
         end: '15:00',
-        color: '#1f8fbf',
+        color: '#b07d00',
         note: '',
         order: 0,
       },
