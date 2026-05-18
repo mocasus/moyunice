@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Logo Universitas Negeri Semarang">
+  <defs>
+    <linearGradient id="shieldGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f7a3a"/>
+      <stop offset="100%" stop-color="#0a5a2a"/>
+    </linearGradient>
+    <linearGradient id="flameGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffd54a"/>
+      <stop offset="100%" stop-color="#f5a623"/>
+    </linearGradient>
+    <radialGradient id="coreGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#fff8c4"/>
+      <stop offset="100%" stop-color="#ffd54a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Outer shield -->
+  <path d="M100 8 L180 36 L180 100 C180 145 145 178 100 192 C55 178 20 145 20 100 L20 36 Z"
+        fill="url(#shieldGrad)" stroke="#fff" stroke-width="3"/>
+
+  <!-- Inner shield ring -->
+  <path d="M100 20 L168 44 L168 100 C168 138 138 168 100 180 C62 168 32 138 32 100 L32 44 Z"
+        fill="none" stroke="#ffd54a" stroke-width="2" opacity="0.85"/>
+
+  <!-- Open book (knowledge) -->
+  <g transform="translate(100 130)">
+    <path d="M-44 0 Q-22 -10 0 -4 Q22 -10 44 0 L44 18 Q22 8 0 14 Q-22 8 -44 18 Z"
+          fill="#ffffff" stroke="#0a3a1f" stroke-width="1.5"/>
+    <line x1="0" y1="-4" x2="0" y2="14" stroke="#0a3a1f" stroke-width="1.5"/>
+    <path d="M-38 4 Q-22 -2 -4 2" fill="none" stroke="#0a3a1f" stroke-width="0.8"/>
+    <path d="M38 4 Q22 -2 4 2" fill="none" stroke="#0a3a1f" stroke-width="0.8"/>
+  </g>
+
+  <!-- Torch flame (semangat / pendidikan) -->
+  <g transform="translate(100 70)">
+    <ellipse cx="0" cy="0" rx="28" ry="36" fill="url(#coreGlow)"/>
+    <path d="M0 -38 C 12 -22 18 -8 14 8 C 22 0 22 -14 16 -22 C 26 -10 26 8 16 18
+             C 8 26 -8 26 -16 18 C -26 8 -26 -10 -16 -22 C -22 -14 -22 0 -14 8
+             C -18 -8 -12 -22 0 -38 Z"
+          fill="url(#flameGrad)" stroke="#b8761a" stroke-width="1"/>
+    <path d="M0 -22 C 6 -12 8 -2 4 8 C -4 -2 -6 -12 0 -22 Z" fill="#fff8c4" opacity="0.9"/>
+  </g>
+
+  <!-- Torch handle -->
+  <rect x="94" y="106" width="12" height="22" rx="2" fill="#ffd54a" stroke="#0a3a1f" stroke-width="1"/>
+
+  <!-- Stars -->
+  <g fill="#ffd54a">
+    <circle cx="48" cy="56" r="2.5"/>
+    <circle cx="152" cy="56" r="2.5"/>
+    <circle cx="40" cy="100" r="2"/>
+    <circle cx="160" cy="100" r="2"/>
+  </g>
+
+  <!-- UNNES text -->
+  <text x="100" y="162" text-anchor="middle" font-family="Georgia, serif"
+        font-size="14" font-weight="700" fill="#ffd54a" letter-spacing="3">UNNES</text>
+</svg>

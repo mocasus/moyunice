@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="MoyUNNES - To-do list jadwal kuliahmu agar rapi dan tidak lupa." />
+  <meta name="theme-color" content="#0f7a3a" />
+  <title>MoyUNNES — To-do list jadwal kuliahmu</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles/style.css" />
+</head>
+<body data-theme="light">
+  <!-- ================= HEADER ================= -->
+  <header class="topbar">
+    <div class="brand">
+      <img src="assets/unnes-logo.svg" alt="Logo UNNES" class="brand-logo" />
+      <div class="brand-text">
+        <h1>MoyUNNES</h1>
+        <p>To-do list jadwal kuliahmu agar rapi dan tidak lupa</p>
+      </div>
+    </div>
+
+    <div class="topbar-actions">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" class="icon"><path fill="currentColor" d="M10 4a6 6 0 1 1-3.9 10.6l-3.7 3.7-1.4-1.4 3.7-3.7A6 6 0 0 1 10 4Zm0 2a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg>
+        <input id="searchInput" type="search" placeholder="Cari mata kuliah atau tugas..." aria-label="Cari" />
+      </div>
+      <button class="btn btn-ghost" id="exportBtn" title="Export data ke JSON">
+        <svg viewBox="0 0 24 24" class="icon"><path fill="currentColor" d="M5 20h14v-2H5v2Zm7-18-5 5h3v6h4v-6h3l-5-5Z"/></svg>
+        <span>Export</span>
+      </button>
+      <button class="btn btn-ghost" id="importBtn" title="Import data dari JSON">
+        <svg viewBox="0 0 24 24" class="icon"><path fill="currentColor" d="M5 20h14v-2H5v2Zm7-16v6H9l3 5 3-5h-3V4h-0Zm0 0h0Z"/></svg>
+        <span>Import</span>
+      </button>
+      <input type="file" id="importFile" accept="application/json" hidden />
+      <button class="btn btn-ghost" id="notifyBtn" title="Aktifkan notifikasi browser">
+        <svg viewBox="0 0 24 24" class="icon"><path fill="currentColor" d="M12 22a2.5 2.5 0 0 0 2.45-2H9.55A2.5 2.5 0 0 0 12 22Zm7-6V11a7 7 0 1 0-14 0v5l-2 2v1h18v-1l-2-2Z"/></svg>
+        <span>Notifikasi</span>
+      </button>
+      <button class="btn btn-ghost icon-only" id="themeBtn" title="Mode terang/gelap" aria-label="Toggle tema">
+        <svg viewBox="0 0 24 24" class="icon"><path fill="currentColor" d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36A5.5 5.5 0 0 1 13.36 3.1 9.07 9.07 0 0 0 12 3Z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ================= LAYOUT ================= -->
+  <main class="layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-head">
+          <h2>Hari</h2>
+          <button class="btn btn-primary btn-sm" id="addDayBtn" title="Tambah hari">
+            <svg viewBox="0 0 24 24" class="icon"><path fill="currentColor" d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z"/></svg>
+            <span>Tambah</span>
+          </button>
+        </div>
+        <ul class="day-list" id="dayList" aria-label="Daftar hari"></ul>
+      </div>
+
+      <div class="sidebar-section stats">
+        <h3>Ringkasan</h3>
+        <div class="stat-row">
+          <span>Total mata kuliah</span><strong id="statCourses">0</strong>
+        </div>
+        <div class="stat-row">
+          <span>Total tugas</span><strong id="statTasks">0</strong>
+        </div>
+        <div class="stat-row">
+          <span>Tugas selesai</span><strong id="statDone">0</strong>
+        </div>
+        <div class="progress">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <small id="progressText">0% selesai</small>
+      </div>
+
+      <div class="sidebar-section tips">
+        <h3>Tips</h3>
+        <ul>
+          <li>Tarik kartu mata kuliah untuk mengubah urutan.</li>
+          <li>Tarik tugas antar mata kuliah/hari.</li>
+          <li>Aktifkan notifikasi untuk pengingat otomatis.</li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- BOARD -->
+    <section class="board" id="board">
+      <div class="board-head">
+        <div>
+          <h2 id="boardTitle">Jadwal Kuliahmu</h2>
+          <p id="boardSubtitle" class="muted">Atur mata kuliah & tugas dengan drag-and-drop yang mulus.</p>
+        </div>
+        <div class="board-actions">
+          <button class="btn btn-primary" id="addCourseBtn">
+            <svg viewBox="0 0 24 24" class="icon"><path fill="currentColor" d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z"/></svg>
+            <span>Tambah Mata Kuliah</span>
+          </button>
+          <select id="filterSelect" class="select" aria-label="Filter tampilan">
+            <option value="all">Semua hari</option>
+            <option value="today">Hari ini</option>
+            <option value="active">Aktif (ada hari)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="day-columns" id="dayColumns" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <!-- ================= MODALS ================= -->
+  <!-- Day modal -->
+  <div class="modal" id="dayModal" hidden>
+    <div class="modal-card">
+      <header>
+        <h3 id="dayModalTitle">Tambah Hari</h3>
+        <button class="icon-btn" data-close-modal aria-label="Tutup">×</button>
+      </header>
+      <form id="dayForm" class="form">
+        <label>Nama hari
+          <input name="name" required maxlength="40" placeholder="Senin" />
+        </label>
+        <label>Warna aksen
+          <input type="color" name="color" value="#0f7a3a" />
+        </label>
+        <footer>
+          <button type="button" class="btn btn-ghost" data-close-modal>Batal</button>
+          <button type="submit" class="btn btn-primary">Simpan</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- Course modal -->
+  <div class="modal" id="courseModal" hidden>
+    <div class="modal-card">
+      <header>
+        <h3 id="courseModalTitle">Tambah Mata Kuliah</h3>
+        <button class="icon-btn" data-close-modal aria-label="Tutup">×</button>
+      </header>
+      <form id="courseForm" class="form">
+        <label>Nama mata kuliah
+          <input name="name" required placeholder="Pemrograman Web" />
+        </label>
+        <div class="form-row">
+          <label>Hari
+            <select name="dayId" id="courseDaySelect" required></select>
+          </label>
+          <label>Dosen
+            <input name="lecturer" placeholder="Bpk/Ibu ..." />
+          </label>
+        </div>
+        <div class="form-row">
+          <label>Mulai
+            <input type="time" name="start" />
+          </label>
+          <label>Selesai
+            <input type="time" name="end" />
+          </label>
+        </div>
+        <div class="form-row">
+          <label>Ruang
+            <input name="room" placeholder="E5-101" />
+          </label>
+          <label>Warna
+            <input type="color" name="color" value="#0f7a3a" />
+          </label>
+        </div>
+        <label>Catatan
+          <textarea name="note" rows="2" placeholder="Catatan singkat..."></textarea>
+        </label>
+        <footer>
+          <button type="button" class="btn btn-ghost" data-close-modal>Batal</button>
+          <button type="submit" class="btn btn-primary">Simpan</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- Task modal -->
+  <div class="modal" id="taskModal" hidden>
+    <div class="modal-card">
+      <header>
+        <h3 id="taskModalTitle">Tambah Tugas</h3>
+        <button class="icon-btn" data-close-modal aria-label="Tutup">×</button>
+      </header>
+      <form id="taskForm" class="form">
+        <label>Judul
+          <input name="title" required placeholder="Kerjakan laporan praktikum" />
+        </label>
+        <div class="form-row">
+          <label>Tenggat
+            <input type="datetime-local" name="due" />
+          </label>
+          <label>Prioritas
+            <select name="priority">
+              <option value="low">Rendah</option>
+              <option value="normal" selected>Normal</option>
+              <option value="high">Tinggi</option>
+            </select>
+          </label>
+        </div>
+        <label>Detail
+          <textarea name="detail" rows="3" placeholder="Detail tugas..."></textarea>
+        </label>
+        <footer>
+          <button type="button" class="btn btn-ghost" data-close-modal>Batal</button>
+          <button type="submit" class="btn btn-primary">Simpan</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <!-- Confirm modal -->
+  <div class="modal" id="confirmModal" hidden>
+    <div class="modal-card small">
+      <header>
+        <h3 id="confirmTitle">Konfirmasi</h3>
+        <button class="icon-btn" data-close-modal aria-label="Tutup">×</button>
+      </header>
+      <div class="confirm-body">
+        <p id="confirmText">Yakin ingin menghapus?</p>
+      </div>
+      <footer>
+        <button type="button" class="btn btn-ghost" data-close-modal>Batal</button>
+        <button type="button" class="btn btn-danger" id="confirmOk">Hapus</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <span>© <span id="year"></span> MoyUNNES — Dibuat untuk mahasiswa Universitas Negeri Semarang.</span>
+    <span class="muted">Data tersimpan lokal di browser kamu.</span>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="scripts/storage.js" defer></script>
+  <script src="scripts/notifications.js" defer></script>
+  <script src="scripts/dragdrop.js" defer></script>
+  <script src="scripts/app.js" defer></script>
+</body>
+</html>
