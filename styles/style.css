@@ -492,3 +492,207 @@ input[type="color"] { padding: 4px; height: 40px; cursor: pointer; }
 .sidebar::-webkit-scrollbar { width: 8px; }
 .sidebar::-webkit-scrollbar-thumb { background: var(--yellow-400); border-radius: 999px; }
 .sidebar::-webkit-scrollbar-thumb:hover { background: var(--yellow-600); }
+
+
+
+/* =========================================================
+   FITUR BARU v3
+   ========================================================= */
+
+/* ========== Pomodoro ========== */
+.pomodoro { text-align: center; }
+.pomodoro .sidebar-head { justify-content: space-between; }
+.pomo-label {
+  font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 999px;
+  background: var(--yellow-200); color: var(--yellow-900);
+  letter-spacing: .4px; text-transform: uppercase;
+}
+.pomo-label[data-mode="break"] { background: #d3efe1; color: #1d6a3a; }
+.pomo-display {
+  font-family: 'Poppins', sans-serif;
+  font-size: 44px; font-weight: 700; letter-spacing: 1px;
+  color: var(--yellow-900);
+  margin: 6px 0 12px;
+  font-variant-numeric: tabular-nums;
+}
+[data-theme="dark"] .pomo-display { color: var(--yellow-300); }
+.pomo-actions { display: flex; gap: 6px; justify-content: center; margin-bottom: 10px; flex-wrap: wrap; }
+.pomo-actions .btn { flex: 1; min-width: 72px; }
+#pomoStart[data-running="1"] {
+  background: linear-gradient(180deg, #ea6f6f, var(--danger));
+  border-color: var(--danger-strong);
+  color: #fff;
+}
+.pomo-config {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0 6px;
+}
+.pomo-config label {
+  display: flex; flex-direction: column; gap: 4px;
+  font-size: 11px; font-weight: 700; color: var(--text-soft); text-align: left;
+}
+.pomo-config input[type="number"] {
+  height: 32px; padding: 0 8px; border-radius: 8px; border: 2px solid var(--yellow-300);
+  background: var(--bg-elev); color: var(--text); font-size: 13px; font-family: inherit;
+}
+.pomo-config input[type="number"]:focus {
+  outline: none; border-color: var(--yellow-500); box-shadow: 0 0 0 3px rgba(245,184,0,.25);
+}
+
+/* ========== Subtasks ========== */
+.task-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.sub-toggle {
+  background: transparent; border: none; cursor: pointer;
+  color: var(--yellow-800); font-size: 14px; padding: 0 4px;
+  transition: color var(--transition);
+}
+.sub-toggle:hover { color: var(--yellow-900); }
+
+.subtask-progress {
+  height: 4px; background: var(--yellow-100); border-radius: 999px;
+  margin-top: 6px; overflow: hidden;
+}
+.subtask-progress-bar {
+  height: 100%; background: linear-gradient(90deg, var(--yellow-500), var(--yellow-700));
+  transition: width 400ms cubic-bezier(.2,.7,.2,1);
+}
+
+.subtask-list {
+  list-style: none; margin: 6px 0 0; padding: 0;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.subtask-item {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--text-soft);
+  padding: 2px 4px;
+}
+.subtask-item.done span { text-decoration: line-through; opacity: .6; }
+.subtask-item input[type="checkbox"] {
+  width: 14px; height: 14px;
+  appearance: none; -webkit-appearance: none;
+  border: 2px solid var(--yellow-600); border-radius: 4px;
+  cursor: pointer; position: relative; background: var(--bg-elev);
+}
+.subtask-item input[type="checkbox"]:checked {
+  background: var(--yellow-500); border-color: var(--yellow-700);
+}
+.subtask-item input[type="checkbox"]:checked::after {
+  content: ""; position: absolute; left: 2px; top: -1px; width: 4px; height: 8px;
+  border-right: 2px solid var(--yellow-900); border-bottom: 2px solid var(--yellow-900);
+  transform: rotate(45deg);
+}
+
+/* Subtask editor (di modal) */
+.subtask-editor {
+  display: flex; flex-direction: column; gap: 6px;
+  margin-bottom: 6px;
+}
+.subtask-row {
+  display: flex; gap: 6px; align-items: center;
+}
+.subtask-row .sub-input {
+  flex: 1; height: 36px; padding: 0 10px;
+  border-radius: 8px; border: 2px solid var(--yellow-300);
+  background: var(--bg-elev); color: var(--text); font-size: 13px;
+}
+.subtask-row .sub-input:focus {
+  outline: none; border-color: var(--yellow-500);
+  box-shadow: 0 0 0 3px rgba(245,184,0,.25);
+}
+
+/* ========== Stats ========== */
+.text-danger { color: var(--danger) !important; }
+
+/* ========== Keyboard hint (kbd) ========== */
+kbd {
+  display: inline-block;
+  padding: 2px 7px;
+  background: var(--yellow-100);
+  border: 1px solid var(--yellow-400);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  font-family: 'JetBrains Mono', 'SFMono-Regular', Consolas, monospace;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--yellow-900);
+  box-shadow: 0 1px 0 rgba(122,75,0,.15);
+  line-height: 1.1;
+}
+
+.shortcut-table {
+  width: 100%; border-collapse: collapse;
+}
+.shortcut-table td {
+  padding: 8px 6px;
+  border-bottom: 1px dashed var(--yellow-300);
+  font-size: 13.5px;
+  color: var(--text);
+}
+.shortcut-table td:first-child {
+  white-space: nowrap; width: 40%;
+}
+
+/* ========== Print mode ========== */
+.print-header { display: none; }
+
+@media print {
+  @page { margin: 12mm; }
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  .topbar, .sidebar, .footer, .toast-container, .modal,
+  .board-actions, .day-column-actions, .course-actions,
+  .task-section-head button, .sub-toggle,
+  #helpBtn, #themeBtn, #notifyBtn, #importBtn, #exportBtn,
+  #printBtn, #addCourseBtn, #addDayBtn,
+  .search-wrap {
+    display: none !important;
+  }
+  .layout {
+    display: block !important;
+    padding: 0 !important;
+  }
+  .board { gap: 8px; }
+  .board-head h2 { font-size: 18px; color: #000; }
+  .day-columns {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+  .day-column {
+    box-shadow: none !important;
+    border: 1px solid #888 !important;
+    page-break-inside: avoid;
+    background: #fff !important;
+  }
+  .day-column.is-today { box-shadow: none !important; border-width: 2px !important; }
+  .day-column::before { background: #555 !important; }
+  .course-card {
+    border: 1px solid #aaa !important;
+    border-left: 3px solid #555 !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+    background: #fff !important;
+  }
+  .task-item {
+    background: #f9f9f9 !important;
+    border: 1px solid #ddd !important;
+  }
+  .course-title, .day-column-title h3 { color: #000 !important; }
+  .print-header {
+    display: block !important;
+    text-align: center;
+    padding: 0 0 12px;
+    border-bottom: 2px solid #000;
+    margin-bottom: 12px;
+  }
+  .print-header h1 {
+    font-size: 22px; margin: 0; color: #000;
+  }
+  .print-header p { margin: 4px 0 0; font-size: 12px; color: #555; }
+  .badge, .today-pill, .priority-pill, .due-pill, .chip {
+    border: 1px solid #888 !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+}

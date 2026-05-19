@@ -1,7 +1,7 @@
 /* ============================================================
-   MoyUNNES - app.js
+   MoyUNNES - app.js (v3)
    Controller utama: render UI, CRUD hari/mata kuliah/tugas,
-   modal management, integrasi drag-and-drop & notifikasi.
+   modal management, Pomodoro, shortcut, sort, print, dll.
    ============================================================ */
 (function () {
   'use strict';
@@ -12,6 +12,7 @@
   let activeFilter = 'all';
   let activeDayId = null;        // null = tampil semua hari
   let searchQuery = '';
+  let sortMode = settings.sortMode || 'manual';
 
   // ===== DOM refs =====
   const $ = (sel) => document.querySelector(sel);
@@ -20,7 +21,6 @@
   const dayList = $('#dayList');
   const dayColumns = $('#dayColumns');
   const courseDaySelect = $('#courseDaySelect');
-  const board = $('#board');
 
   // ===== Init =====
   document.addEventListener('DOMContentLoaded', init);
@@ -28,8 +28,11 @@
   function init() {
     $('#year').textContent = new Date().getFullYear();
     applyTheme(settings.theme || 'light');
+    if ($('#sortSelect')) $('#sortSelect').value = sortMode;
     renderAll();
     bindEvents();
+    initPomodoro();
+    bindShortcuts();
 
     // Drag-and-drop
     MoyDnd.attach(dayColumns, { onCommit: handleDndCommit });
@@ -39,11 +42,31 @@
     setInterval(runReminders, 60 * 1000); // cek tiap menit
   }
 
-  function persist() {
-    MoyStorage.saveData(data);
-  }
-  function persistSettings() {
-    MoyStorage.saveSettings(settings);
+  function persist() { MoyStorage.saveData(data); }
+  function persistSettings() { MoyStorage.saveSettings(settings); }
+
+  // ===========================================================
+  //                   POMODORO
+  // ===========================================================
+  function initPomodoro() {
+    if (!window.MoyPomodoro) return;
+    MoyPomodoro.create({
+      display: $('#pomoDisplay'),
+      label: $('#pomoLabel'),
+      sessionCount: $('#pomoSessions'),
+      btnStart: $('#pomoStart'),
+      btnReset: $('#pomoReset'),
+      btnSwitch: $('#pomoSwitch'),
+      focusInput: $('#pomoFocus'),
+      breakInput: $('#pomoBreak'),
+      onComplete: (state) => {
+        const isFocus = state.mode === 'break'; // baru saja selesai fokus
+        const title = isFocus ? '🎉 Sesi fokus selesai!' : '🔁 Istirahat selesai';
+        const msg = isFocus ? 'Saatnya istirahat sebentar.' : 'Yuk lanjut fokus!';
+        MoyNotify.toast({ title, message: msg, type: 'success', duration: 6000 });
+        if (settings.notifyEnabled) MoyNotify.pushNative(title, msg);
+      },
+    });
   }
 
   // ===========================================================
@@ -173,6 +196,26 @@
     });
   }
 
+  function sortTasks(tasks) {
+    const arr = [...tasks];
+    if (sortMode === 'due') {
+      const inf = Number.POSITIVE_INFINITY;
+      arr.sort((a, b) => {
+        const da = a.due ? new Date(a.due).getTime() : inf;
+        const db = b.due ? new Date(b.due).getTime() : inf;
+        return da - db || (a.order ?? 0) - (b.order ?? 0);
+      });
+    } else if (sortMode === 'priority') {
+      const rank = { high: 0, normal: 1, low: 2 };
+      arr.sort((a, b) => (rank[a.priority] ?? 1) - (rank[b.priority] ?? 1) || (a.order ?? 0) - (b.order ?? 0));
+    } else if (sortMode === 'created') {
+      arr.sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));
+    } else {
+      arr.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    }
+    return arr;
+  }
+
   function renderCourseCard(c) {
     const card = document.createElement('article');
     card.className = 'course-card';
@@ -186,6 +229,12 @@
     if (time) chips.push(`<span class="chip time">⏰ ${escapeHtml(time)}</span>`);
     if (c.room) chips.push(`<span class="chip room">📍 ${escapeHtml(c.room)}</span>`);
     if (c.lecturer) chips.push(`<span class="chip">👨‍🏫 ${escapeHtml(c.lecturer)}</span>`);
+
+    const taskCount = data.tasks.filter(t => t.courseId === c.id).length;
+    const taskDoneCount = data.tasks.filter(t => t.courseId === c.id && t.done).length;
+    if (taskCount > 0) {
+      chips.push(`<span class="chip">✅ ${taskDoneCount}/${taskCount}</span>`);
+    }
 
     card.innerHTML = `
       <div class="course-head">
@@ -208,9 +257,7 @@
       </div>
     `;
 
-    const tasks = data.tasks
-      .filter(t => t.courseId === c.id)
-      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    const tasks = sortTasks(data.tasks.filter(t => t.courseId === c.id));
     const taskList = card.querySelector('.task-list');
     tasks.forEach(t => taskList.appendChild(renderTaskItem(t)));
 
@@ -235,16 +282,38 @@
     li.dataset.courseId = t.courseId;
 
     const dueInfo = formatDue(t.due);
+    const subtasks = Array.isArray(t.subtasks) ? t.subtasks : [];
+    const subDone = subtasks.filter(s => s.done).length;
+    const subTotal = subtasks.length;
+    const subPct = subTotal ? Math.round((subDone / subTotal) * 100) : 0;
+    const hasSub = subTotal > 0;
 
     li.innerHTML = `
       <input type="checkbox" ${t.done ? 'checked' : ''} aria-label="Tandai selesai" />
       <div class="task-main">
-        <div class="title">${escapeHtml(t.title)}</div>
+        <div class="task-row">
+          <div class="title">${escapeHtml(t.title)}</div>
+          ${hasSub ? `<button class="sub-toggle" data-action="toggle-sub" aria-label="Lihat subtugas" title="Subtugas (${subDone}/${subTotal})">▾</button>` : ''}
+        </div>
         <div class="sub">
           <span class="priority-pill priority-${escapeAttr(t.priority || 'normal')}">${labelPriority(t.priority)}</span>
           ${dueInfo.html}
+          ${hasSub ? `<span class="due-pill">📋 ${subDone}/${subTotal}</span>` : ''}
           ${t.detail ? `<span class="muted" title="${escapeAttr(t.detail)}">📝</span>` : ''}
         </div>
+        ${hasSub ? `
+          <div class="subtask-progress" aria-hidden="true">
+            <div class="subtask-progress-bar" style="width:${subPct}%"></div>
+          </div>
+          <ul class="subtask-list" hidden>
+            ${subtasks.map((s, i) => `
+              <li class="subtask-item ${s.done ? 'done' : ''}">
+                <input type="checkbox" data-sub-index="${i}" ${s.done ? 'checked' : ''} aria-label="Selesai subtugas" />
+                <span>${escapeHtml(s.title)}</span>
+              </li>
+            `).join('')}
+          </ul>
+        ` : ''}
       </div>
       <button class="icon-btn" data-action="edit-task" title="Edit"><svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25Z"/></svg></button>
       <button class="icon-btn" data-action="delete-task" title="Hapus"><svg viewBox="0 0 24 24" width="14" height="14"><path fill="currentColor" d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12ZM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4Z"/></svg></button>
@@ -252,11 +321,36 @@
 
     li.querySelector('input[type="checkbox"]').addEventListener('change', (ev) => {
       t.done = ev.target.checked;
+      // Saat menandai selesai, tandai semua subtask selesai juga
+      if (t.done && Array.isArray(t.subtasks)) {
+        t.subtasks.forEach(s => s.done = true);
+      }
       persist();
-      li.classList.toggle('done', t.done);
-      renderStats();
+      renderAll();
       if (t.done) MoyNotify.toast({ title: '✅ Tugas selesai', message: t.title, type: 'success' });
     });
+    li.querySelectorAll('input[data-sub-index]').forEach(cb => {
+      cb.addEventListener('change', (ev) => {
+        const i = Number(ev.target.dataset.subIndex);
+        if (Array.isArray(t.subtasks) && t.subtasks[i]) {
+          t.subtasks[i].done = ev.target.checked;
+          // Auto: jika semua subtask selesai → tugas dianggap selesai
+          if (t.subtasks.every(s => s.done)) t.done = true;
+          else if (t.done && t.subtasks.some(s => !s.done)) t.done = false;
+          persist();
+          renderAll();
+        }
+      });
+    });
+    const subToggle = li.querySelector('[data-action="toggle-sub"]');
+    if (subToggle) {
+      subToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const ul = li.querySelector('.subtask-list');
+        if (ul) ul.hidden = !ul.hidden;
+        subToggle.textContent = (ul && !ul.hidden) ? '▴' : '▾';
+      });
+    }
     li.querySelector('[data-action="edit-task"]').addEventListener('click', (e) => {
       e.stopPropagation(); openTaskModal(t, t.courseId);
     });
@@ -270,9 +364,22 @@
     const courses = data.courses.length;
     const tasks = data.tasks.length;
     const done = data.tasks.filter(t => t.done).length;
+    const now = Date.now();
+    const dayMs = 24 * 60 * 60 * 1000;
+    let dueSoon = 0, overdue = 0;
+    data.tasks.forEach(t => {
+      if (t.done || !t.due) return;
+      const d = new Date(t.due).getTime();
+      if (Number.isNaN(d)) return;
+      if (d < now) overdue += 1;
+      else if (d - now <= dayMs) dueSoon += 1;
+    });
+
     $('#statCourses').textContent = courses;
     $('#statTasks').textContent = tasks;
     $('#statDone').textContent = done;
+    if ($('#statDueSoon')) $('#statDueSoon').textContent = dueSoon;
+    if ($('#statOverdue')) $('#statOverdue').textContent = overdue;
     const pct = tasks ? Math.round((done / tasks) * 100) : 0;
     $('#progressBar').style.width = pct + '%';
     $('#progressText').textContent = pct + '% selesai';
@@ -313,6 +420,14 @@
     $('#addDayBtn').addEventListener('click', () => openDayModal(null));
     $('#addCourseBtn').addEventListener('click', () => openCourseModal(null, null));
     $('#filterSelect').addEventListener('change', (e) => { activeFilter = e.target.value; renderDayColumns(); });
+    if ($('#sortSelect')) {
+      $('#sortSelect').addEventListener('change', (e) => {
+        sortMode = e.target.value;
+        settings.sortMode = sortMode;
+        persistSettings();
+        renderDayColumns();
+      });
+    }
     $('#searchInput').addEventListener('input', (e) => {
       searchQuery = e.target.value.trim();
       renderDayColumns();
@@ -344,6 +459,16 @@
       persistSettings();
       if (ok) MoyNotify.toast({ title: 'Notifikasi aktif', message: 'Kamu akan menerima pengingat otomatis.', type: 'success' });
     });
+    if ($('#printBtn')) {
+      $('#printBtn').addEventListener('click', () => {
+        const printDate = new Date().toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'short' });
+        if ($('#printDate')) $('#printDate').textContent = 'Dicetak: ' + printDate;
+        window.print();
+      });
+    }
+    if ($('#helpBtn')) {
+      $('#helpBtn').addEventListener('click', () => { $('#helpModal').hidden = false; });
+    }
 
     // Modal close (semua modal)
     document.addEventListener('click', (ev) => {
@@ -354,14 +479,77 @@
         ev.target.hidden = true;
       }
     });
-    document.addEventListener('keydown', (ev) => {
-      if (ev.key === 'Escape') $$('.modal').forEach(m => m.hidden = true);
-    });
 
     // Form submits
     $('#dayForm').addEventListener('submit', onDaySubmit);
     $('#courseForm').addEventListener('submit', onCourseSubmit);
     $('#taskForm').addEventListener('submit', onTaskSubmit);
+
+    // Subtask editor di modal task
+    if ($('#subtaskAddBtn')) {
+      $('#subtaskAddBtn').addEventListener('click', () => addSubtaskRow(''));
+    }
+  }
+
+  // ===========================================================
+  //                   KEYBOARD SHORTCUTS
+  // ===========================================================
+  function bindShortcuts() {
+    document.addEventListener('keydown', (ev) => {
+      // Esc selalu boleh untuk tutup modal
+      if (ev.key === 'Escape') {
+        $$('.modal').forEach(m => m.hidden = true);
+        return;
+      }
+
+      // Ctrl+K untuk fokus search (juga saat di input)
+      if ((ev.ctrlKey || ev.metaKey) && ev.key.toLowerCase() === 'k') {
+        ev.preventDefault();
+        $('#searchInput').focus();
+        $('#searchInput').select();
+        return;
+      }
+
+      // Skip shortcut lain saat sedang mengetik
+      const tag = (ev.target && ev.target.tagName) || '';
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(tag) || (ev.target && ev.target.isContentEditable)) return;
+
+      // Tampilkan help dengan ? atau /
+      if (ev.key === '?' || (ev.shiftKey && ev.key === '/')) {
+        ev.preventDefault();
+        $('#helpModal').hidden = false;
+        return;
+      }
+
+      switch (ev.key.toLowerCase()) {
+        case 'n':
+          ev.preventDefault();
+          openCourseModal(null, null);
+          break;
+        case 'd':
+          if (ev.shiftKey) {
+            ev.preventDefault();
+            openDayModal(null);
+          }
+          break;
+        case 't':
+          ev.preventDefault();
+          toggleTheme();
+          break;
+        case 'p':
+          ev.preventDefault();
+          if ($('#pomoStart')) $('#pomoStart').click();
+          break;
+        case 'f':
+          ev.preventDefault();
+          const sel = $('#filterSelect');
+          if (sel) {
+            sel.value = sel.value === 'today' ? 'all' : 'today';
+            sel.dispatchEvent(new Event('change'));
+          }
+          break;
+      }
+    });
   }
 
   // ===========================================================
@@ -371,6 +559,9 @@
     document.body.dataset.theme = theme;
     settings.theme = theme;
     persistSettings();
+    // Update theme-color meta agar address bar mobile ikut berubah
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.content = theme === 'dark' ? '#382a00' : '#f5b800';
   }
   function toggleTheme() {
     applyTheme(document.body.dataset.theme === 'dark' ? 'light' : 'dark');
@@ -505,20 +696,49 @@
   }
 
   // ===========================================================
-  //                   TASK CRUD
+  //                   TASK CRUD (+ SUBTASK)
   // ===========================================================
   let editingTask = null;
+
+  function clearSubtaskEditor() {
+    const editor = $('#subtaskEditor');
+    if (editor) editor.innerHTML = '';
+  }
+  function addSubtaskRow(value) {
+    const editor = $('#subtaskEditor');
+    if (!editor) return;
+    const row = document.createElement('div');
+    row.className = 'subtask-row';
+    row.innerHTML = `
+      <input type="text" class="sub-input" placeholder="Contoh: baca bab 1" value="${escapeAttr(value || '')}" />
+      <button type="button" class="icon-btn" data-action="remove-sub" aria-label="Hapus subtugas">×</button>
+    `;
+    row.querySelector('[data-action="remove-sub"]').addEventListener('click', () => row.remove());
+    editor.appendChild(row);
+    const input = row.querySelector('input');
+    setTimeout(() => input.focus(), 30);
+  }
+  function readSubtasksFromEditor(existing) {
+    const rows = $$('#subtaskEditor .subtask-row');
+    return rows.map((row, i) => {
+      const title = (row.querySelector('input').value || '').trim();
+      const prev = existing && existing[i];
+      return { title, done: prev ? !!prev.done : false };
+    }).filter(s => s.title.length > 0);
+  }
+
   function openTaskModal(task, courseId) {
-    editingTask = task;
     editingTask = task ? { ...task } : null;
     const f = $('#taskForm');
     f.reset();
     f.dataset.courseId = courseId || (task && task.courseId) || '';
+    clearSubtaskEditor();
     if (task) {
       f.title.value = task.title || '';
       f.due.value = task.due || '';
       f.priority.value = task.priority || 'normal';
       f.detail.value = task.detail || '';
+      (task.subtasks || []).forEach(s => addSubtaskRow(s.title));
       $('#taskModalTitle').textContent = 'Ubah Tugas';
     } else {
       $('#taskModalTitle').textContent = 'Tambah Tugas';
@@ -531,11 +751,13 @@
     const fd = new FormData(ev.target);
     const courseId = ev.target.dataset.courseId || (editingTask && editingTask.courseId);
     if (!courseId) return;
+    const subtasks = readSubtasksFromEditor(editingTask && editingTask.subtasks);
     const payload = {
       title: String(fd.get('title') || '').trim(),
       due: String(fd.get('due') || ''),
       priority: String(fd.get('priority') || 'normal'),
       detail: String(fd.get('detail') || '').trim(),
+      subtasks,
     };
     if (!payload.title) return;
     if (editingTask && editingTask.id) {
@@ -593,17 +815,14 @@
       if (!t) return;
       const newCourseId = toContainer.dataset.courseId;
       if (!newCourseId) return;
-      // siblings tujuan tanpa item yang dipindah
       const siblings = data.tasks
         .filter(x => x.courseId === newCourseId && x.id !== id)
         .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
       const beforeIndex = beforeId ? siblings.findIndex(x => x.id === beforeId) : siblings.length;
       const insertAt = beforeIndex === -1 ? siblings.length : beforeIndex;
       siblings.splice(insertAt, 0, t);
-      // Pindahkan
       t.courseId = newCourseId;
       siblings.forEach((s, i) => { s.order = i; });
-      // Pertahankan order untuk task lain di kursus lama (kompak ulang)
       const oldGroups = {};
       data.tasks.forEach(x => {
         if (x.courseId === newCourseId) return;
@@ -613,6 +832,13 @@
         arr.sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
            .forEach((x, i) => { x.order = i; });
       });
+      // Saat user manual drag, kembali ke mode manual sort
+      if (sortMode !== 'manual') {
+        sortMode = 'manual';
+        if ($('#sortSelect')) $('#sortSelect').value = 'manual';
+        settings.sortMode = 'manual';
+        persistSettings();
+      }
       persist(); renderAll();
     } else if (type === 'course') {
       const c = data.courses.find(x => x.id === id);
@@ -627,7 +853,6 @@
       siblings.splice(insertAt, 0, c);
       c.dayId = newDayId;
       siblings.forEach((s, i) => { s.order = i; });
-      // kompak ulang day lain
       const groups = {};
       data.courses.forEach(x => {
         if (x.dayId === newDayId) return;

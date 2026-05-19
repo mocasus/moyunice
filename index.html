@@ -6,17 +6,19 @@
   <meta name="description" content="MoyUNNES - To-do list jadwal kuliahmu agar rapi dan tidak lupa." />
   <meta name="theme-color" content="#f5b800" />
   <title>MoyUNNES — To-do list jadwal kuliahmu</title>
-  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=2" />
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg?v=3" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="assets/unnes-logo.jpg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles/style.css?v=2" />
+  <link rel="stylesheet" href="styles/style.css?v=3" />
 </head>
 <body data-theme="light">
   <!-- ================= HEADER ================= -->
   <header class="topbar">
     <div class="brand">
-      <img src="assets/unnes-logo.jpg?v=2" alt="Logo Universitas Negeri Semarang" class="brand-logo" />
+      <img src="assets/unnes-logo.jpg?v=3" alt="Logo Universitas Negeri Semarang" class="brand-logo" />
       <div class="brand-text">
         <h1>MoyUNNES</h1>
         <p>To-do list jadwal kuliahmu agar rapi dan tidak lupa</p>
@@ -26,7 +28,7 @@
     <div class="topbar-actions">
       <div class="search-wrap">
         <svg viewBox="0 0 24 24" class="icon"><path fill="currentColor" d="M10 4a6 6 0 1 1-3.9 10.6l-3.7 3.7-1.4-1.4 3.7-3.7A6 6 0 0 1 10 4Zm0 2a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg>
-        <input id="searchInput" type="search" placeholder="Cari mata kuliah atau tugas..." aria-label="Cari" />
+        <input id="searchInput" type="search" placeholder="Cari mata kuliah atau tugas... (Ctrl+K)" aria-label="Cari" />
       </div>
       <button class="btn btn-ghost" id="exportBtn" title="Export data ke JSON">
         <svg viewBox="0 0 24 24" class="icon"><path fill="currentColor" d="M5 20h14v-2H5v2Zm7-18-5 5h3v6h4v-6h3l-5-5Z"/></svg>
@@ -37,11 +39,18 @@
         <span>Import</span>
       </button>
       <input type="file" id="importFile" accept="application/json" hidden />
+      <button class="btn btn-ghost" id="printBtn" title="Cetak / simpan PDF">
+        <svg viewBox="0 0 24 24" class="icon"><path fill="currentColor" d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z"/></svg>
+        <span>Cetak</span>
+      </button>
       <button class="btn btn-ghost" id="notifyBtn" title="Aktifkan notifikasi browser">
         <svg viewBox="0 0 24 24" class="icon"><path fill="currentColor" d="M12 22a2.5 2.5 0 0 0 2.45-2H9.55A2.5 2.5 0 0 0 12 22Zm7-6V11a7 7 0 1 0-14 0v5l-2 2v1h18v-1l-2-2Z"/></svg>
         <span>Notifikasi</span>
       </button>
-      <button class="btn btn-ghost icon-only" id="themeBtn" title="Mode terang/gelap" aria-label="Toggle tema">
+      <button class="btn btn-ghost icon-only" id="helpBtn" title="Bantuan & shortcut (?)" aria-label="Bantuan">
+        <svg viewBox="0 0 24 24" class="icon"><path fill="currentColor" d="M11 18h2v-2h-2v2Zm1-16a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm0-14a4 4 0 0 0-4 4h2a2 2 0 1 1 4 0c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5a4 4 0 0 0-4-4Z"/></svg>
+      </button>
+      <button class="btn btn-ghost icon-only" id="themeBtn" title="Mode terang/gelap (T)" aria-label="Toggle tema">
         <svg viewBox="0 0 24 24" class="icon"><path fill="currentColor" d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36A5.5 5.5 0 0 1 13.36 3.1 9.07 9.07 0 0 0 12 3Z"/></svg>
       </button>
     </div>
@@ -51,10 +60,33 @@
   <main class="layout">
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
+      <!-- Pomodoro Timer -->
+      <div class="sidebar-section pomodoro">
+        <div class="sidebar-head">
+          <h2>⏱️ Pomodoro</h2>
+          <span class="pomo-label" id="pomoLabel" data-mode="focus">Fokus</span>
+        </div>
+        <div class="pomo-display" id="pomoDisplay">25:00</div>
+        <div class="pomo-actions">
+          <button class="btn btn-primary btn-sm" id="pomoStart" data-running="0">Mulai</button>
+          <button class="btn btn-ghost btn-sm" id="pomoReset">Reset</button>
+          <button class="btn btn-ghost btn-sm" id="pomoSwitch">Ganti</button>
+        </div>
+        <div class="pomo-config">
+          <label>Fokus (mnt)
+            <input type="number" id="pomoFocus" min="1" max="120" value="25" />
+          </label>
+          <label>Istirahat
+            <input type="number" id="pomoBreak" min="1" max="60" value="5" />
+          </label>
+        </div>
+        <small class="muted">Sesi selesai: <strong id="pomoSessions">0</strong></small>
+      </div>
+
       <div class="sidebar-section">
         <div class="sidebar-head">
           <h2>Hari</h2>
-          <button class="btn btn-primary btn-sm" id="addDayBtn" title="Tambah hari">
+          <button class="btn btn-primary btn-sm" id="addDayBtn" title="Tambah hari (Shift+D)">
             <svg viewBox="0 0 24 24" class="icon"><path fill="currentColor" d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z"/></svg>
             <span>Tambah</span>
           </button>
@@ -63,7 +95,7 @@
       </div>
 
       <div class="sidebar-section stats">
-        <h3>Ringkasan</h3>
+        <h3>📊 Ringkasan</h3>
         <div class="stat-row">
           <span>Total mata kuliah</span><strong id="statCourses">0</strong>
         </div>
@@ -73,6 +105,12 @@
         <div class="stat-row">
           <span>Tugas selesai</span><strong id="statDone">0</strong>
         </div>
+        <div class="stat-row">
+          <span>Tenggat dekat</span><strong id="statDueSoon">0</strong>
+        </div>
+        <div class="stat-row">
+          <span>Terlewat</span><strong id="statOverdue" class="text-danger">0</strong>
+        </div>
         <div class="progress">
           <div class="progress-bar" id="progressBar"></div>
         </div>
@@ -80,11 +118,11 @@
       </div>
 
       <div class="sidebar-section tips">
-        <h3>Tips</h3>
+        <h3>💡 Tips</h3>
         <ul>
           <li>Tarik kartu mata kuliah untuk mengubah urutan.</li>
           <li>Tarik tugas antar mata kuliah/hari.</li>
-          <li>Aktifkan notifikasi untuk pengingat otomatis.</li>
+          <li>Tekan <kbd>?</kbd> untuk lihat semua shortcut.</li>
         </ul>
       </div>
     </aside>
@@ -97,7 +135,7 @@
           <p id="boardSubtitle" class="muted">Atur mata kuliah & tugas dengan drag-and-drop yang mulus.</p>
         </div>
         <div class="board-actions">
-          <button class="btn btn-primary" id="addCourseBtn">
+          <button class="btn btn-primary" id="addCourseBtn" title="Tambah mata kuliah (N)">
             <svg viewBox="0 0 24 24" class="icon"><path fill="currentColor" d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z"/></svg>
             <span>Tambah Mata Kuliah</span>
           </button>
@@ -105,6 +143,12 @@
             <option value="all">Semua hari</option>
             <option value="today">Hari ini</option>
             <option value="active">Aktif (ada hari)</option>
+          </select>
+          <select id="sortSelect" class="select" aria-label="Urutkan tugas" title="Urutan tugas dalam tiap mata kuliah">
+            <option value="manual">Urut: Manual</option>
+            <option value="due">Urut: Tenggat terdekat</option>
+            <option value="priority">Urut: Prioritas tinggi</option>
+            <option value="created">Urut: Terbaru</option>
           </select>
         </div>
       </div>
@@ -208,11 +252,43 @@
         <label>Detail
           <textarea name="detail" rows="3" placeholder="Detail tugas..."></textarea>
         </label>
+        <label>Subtugas (opsional)
+          <div id="subtaskEditor" class="subtask-editor"></div>
+          <button type="button" class="btn btn-ghost btn-sm" id="subtaskAddBtn">+ Tambah subtugas</button>
+        </label>
         <footer>
           <button type="button" class="btn btn-ghost" data-close-modal>Batal</button>
           <button type="submit" class="btn btn-primary">Simpan</button>
         </footer>
       </form>
+    </div>
+  </div>
+
+  <!-- Help / Shortcut modal -->
+  <div class="modal" id="helpModal" hidden>
+    <div class="modal-card">
+      <header>
+        <h3>⌨️ Pintasan Keyboard & Bantuan</h3>
+        <button class="icon-btn" data-close-modal aria-label="Tutup">×</button>
+      </header>
+      <div class="confirm-body">
+        <table class="shortcut-table">
+          <tbody>
+            <tr><td><kbd>?</kbd></td><td>Buka panel bantuan ini</td></tr>
+            <tr><td><kbd>Ctrl</kbd> + <kbd>K</kbd></td><td>Fokus ke kotak pencarian</td></tr>
+            <tr><td><kbd>N</kbd></td><td>Tambah mata kuliah baru</td></tr>
+            <tr><td><kbd>Shift</kbd> + <kbd>D</kbd></td><td>Tambah hari baru</td></tr>
+            <tr><td><kbd>T</kbd></td><td>Toggle tema terang/gelap</td></tr>
+            <tr><td><kbd>P</kbd></td><td>Mulai/jeda Pomodoro</td></tr>
+            <tr><td><kbd>F</kbd></td><td>Filter "Hari ini" / semua</td></tr>
+            <tr><td><kbd>Esc</kbd></td><td>Tutup modal yang terbuka</td></tr>
+          </tbody>
+        </table>
+        <p class="muted" style="margin-top:14px;">Shortcut tidak aktif saat sedang mengetik di kolom input.</p>
+      </div>
+      <footer>
+        <button type="button" class="btn btn-primary" data-close-modal>Mengerti</button>
+      </footer>
     </div>
   </div>
 
@@ -242,10 +318,25 @@
     <span class="muted">Data tersimpan lokal di browser kamu.</span>
   </footer>
 
+  <!-- Print-only header (muncul saat dicetak) -->
+  <div class="print-header" aria-hidden="true">
+    <h1>MoyUNNES — Jadwal Kuliah</h1>
+    <p id="printDate"></p>
+  </div>
+
   <!-- Scripts -->
-  <script src="scripts/storage.js?v=2" defer></script>
-  <script src="scripts/notifications.js?v=2" defer></script>
-  <script src="scripts/dragdrop.js?v=2" defer></script>
-  <script src="scripts/app.js?v=2" defer></script>
+  <script src="scripts/storage.js?v=3" defer></script>
+  <script src="scripts/notifications.js?v=3" defer></script>
+  <script src="scripts/dragdrop.js?v=3" defer></script>
+  <script src="scripts/pomodoro.js?v=3" defer></script>
+  <script src="scripts/app.js?v=3" defer></script>
+  <script>
+    // Daftarkan service worker untuk PWA (offline + installable)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js').catch(() => {});
+      });
+    }
+  </script>
 </body>
 </html>
