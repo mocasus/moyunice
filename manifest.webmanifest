@@ -1,0 +1,27 @@
+{
+  "name": "MoyUNNES — Jadwal Kuliah & To-do",
+  "short_name": "MoyUNNES",
+  "description": "To-do list jadwal kuliahmu agar rapi dan tidak lupa.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#fff8dc",
+  "theme_color": "#f5b800",
+  "lang": "id",
+  "icons": [
+    {
+      "src": "assets/unnes-logo.jpg",
+      "sizes": "1146x1528",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "education", "lifestyle"]
+}

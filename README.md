@@ -1,42 +1,85 @@
-# MoyUNNES
+<p align="center">
+  <img src="assets/unnes-logo.jpg" alt="Logo UNNES" width="100" />
+</p>
 
-> **To-do list jadwal kuliahmu agar rapi dan tidak lupa.**
-> Dibuat untuk mahasiswa Universitas Negeri Semarang.
+<h1 align="center">MoyUNNES</h1>
 
-MoyUNNES adalah aplikasi web ringan tanpa server yang menggabungkan **jadwal kuliah** dan **to-do list** dalam satu papan interaktif bergaya Kanban — dengan drag-and-drop yang mulus, notifikasi pengingat, dan tema gelap/terang.
+<p align="center">
+  <strong>To-do list jadwal kuliahmu agar rapi dan tidak lupa.</strong><br/>
+  <sub>Dibuat khusus untuk mahasiswa Universitas Negeri Semarang.</sub>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Platform-Web-f5b800?style=for-the-badge&logo=html5&logoColor=white" />
+  <img src="https://img.shields.io/badge/Framework-Vanilla_JS-7a4b00?style=for-the-badge&logo=javascript&logoColor=white" />
+  <img src="https://img.shields.io/badge/Storage-LocalStorage-e0a300?style=for-the-badge&logo=databricks&logoColor=white" />
+  <img src="https://img.shields.io/badge/License-MIT-ffcf3d?style=for-the-badge" />
+</p>
+
+---
+
+## Tentang
+
+**MoyUNNES** adalah aplikasi web ringan tanpa server yang menggabungkan **jadwal kuliah** dan **to-do list tugas** dalam satu papan interaktif bergaya Kanban. Dirancang agar mahasiswa UNNES bisa mengatur jadwal mingguan dengan mudah — drag, drop, selesai.
+
+- Tidak butuh akun atau login
+- Semua data tersimpan di browser (localStorage)
+- Bisa diakses offline setelah pertama kali dimuat
+- Responsif — desktop & mobile
 
 ---
 
 ## Fitur Utama
 
-- **Konfigurasi hari fleksibel** — tambah/edit/hapus hari sesuai kebutuhan (Senin–Minggu, atau hanya Senin–Jumat, terserah kamu).
-- **Mata kuliah lengkap** — nama, dosen, jam, ruang, warna aksen, catatan.
-- **To-do list per mata kuliah** — judul, detail, prioritas (rendah/normal/tinggi), tenggat waktu, status selesai.
-- **Drag & drop yang mulus**:
-  - Reorder mata kuliah dalam satu hari.
-  - Pindahkan mata kuliah antar hari.
-  - Reorder atau pindahkan tugas antar mata kuliah.
-- **Notifikasi pintar**:
-  - Toast in-app untuk setiap aksi.
-  - Notifikasi browser saat 1 jam / 10 menit menjelang tenggat.
-  - Pengingat 15 menit sebelum kelas dimulai.
-- **Pencarian & filter** — cari mata kuliah/tugas, atau filter "Hari ini".
-- **Tema terang & gelap** — beralih instan.
-- **Logo UNNES** kustom (SVG) dengan palet hijau-emas khas universitas.
-- **Export / Import JSON** — backup atau pindahkan datamu.
-- **Penyimpanan lokal** — semua data tersimpan di browser; tidak butuh akun.
-- **Responsif** — bekerja baik di desktop maupun mobile.
+| Fitur | Deskripsi |
+|-------|-----------|
+| **Hari fleksibel** | Tambah/edit/hapus hari sesukamu (Senin–Minggu, atau cuma 5 hari) |
+| **Mata kuliah lengkap** | Nama, dosen, jam mulai-selesai, ruang, warna aksen, catatan |
+| **To-do per mata kuliah** | Judul, detail, prioritas (rendah/normal/tinggi), tenggat, checkbox selesai |
+| **Drag & drop smooth** | Reorder mata kuliah & tugas, pindah antar hari/mata kuliah dengan animasi halus |
+| **Notifikasi pintar** | Toast in-app + notifikasi browser (1 jam & 10 menit sebelum tenggat, 15 menit sebelum kelas) |
+| **Pencarian & filter** | Real-time search + filter "Hari ini" / "Aktif" |
+| **Tema terang & gelap** | Toggle instan, preferensi tersimpan |
+| **Export / Import JSON** | Backup atau migrasi data dengan satu klik |
+| **Logo UNNES resmi** | Diambil langsung dari Wikimedia Commons |
+| **Statistik progress** | Total mata kuliah, tugas, dan persentase selesai dengan progress bar |
+
+---
+
+## Screenshot
+
+> Buka langsung: **[moyunice.vercel.app](https://moyunice.vercel.app)** (atau URL deploy kamu)
 
 ---
 
 ## Cara Pakai
 
-1. Buka `index.html` di browser modern (Chrome, Edge, Firefox, Safari).
-2. Sidebar kiri menampilkan daftar hari. Tombol **+ Tambah** untuk menambah hari baru.
-3. Tombol **Tambah Mata Kuliah** di header papan untuk menambah mata kuliah.
-4. Klik tombol kecil **+ Tambah tugas** di setiap kartu mata kuliah untuk menambah tugas.
-5. **Tarik** kartu mata kuliah atau item tugas untuk mengubah urutan / memindahkannya.
-6. Klik tombol **Notifikasi** di header sekali untuk memberi izin pengingat browser.
+```
+1. Buka website MoyUNNES di browser modern
+2. Sidebar kiri → klik "+ Tambah" untuk menambah hari
+3. Header papan → klik "Tambah Mata Kuliah"
+4. Di setiap kartu mata kuliah → klik "+ Tambah tugas"
+5. Tarik (drag) kartu atau tugas untuk mengubah urutan / pindah hari
+6. Klik tombol Notifikasi di header untuk mengaktifkan pengingat browser
+7. Gunakan toggle bulan di kanan atas untuk beralih tema gelap/terang
+```
+
+---
+
+## Teknologi
+
+| Layer | Tech |
+|-------|------|
+| Markup | HTML5 semantik |
+| Styling | CSS3 (Custom Properties, Grid, Flexbox, Animations) |
+| Logic | Vanilla JavaScript (ES6+, modular IIFE) |
+| Storage | Web Storage API (localStorage) |
+| Notifikasi | Web Notification API + in-app toast |
+| Drag & Drop | HTML5 Drag and Drop API + custom placeholder |
+| Font | Plus Jakarta Sans + Poppins (Google Fonts) |
+| Hosting | Vercel / GitHub Pages / Netlify (static) |
+
+**Zero dependencies. Zero build step.** Cukup buka `index.html`.
 
 ---
 
@@ -44,23 +87,72 @@ MoyUNNES adalah aplikasi web ringan tanpa server yang menggabungkan **jadwal kul
 
 ```
 moyunice/
-  index.html
-  styles/
-    style.css
-  scripts/
-    storage.js        # localStorage + import/export JSON
-    notifications.js  # toast + Web Notification API + reminder logic
-    dragdrop.js       # drag-and-drop dengan placeholder yang halus
-    app.js            # controller utama (render, CRUD, events)
-  assets/
-    unnes-logo.svg    # logo MoyUNNES bergaya UNNES
-    favicon.svg
+├── index.html              # Halaman utama + semua modal
+├── vercel.json             # Config Vercel (cache headers)
+├── .nojekyll               # Bypass Jekyll di GitHub Pages
+├── .github/
+│   └── workflows/
+│       └── deploy-pages.yml  # Auto-deploy ke GitHub Pages
+├── styles/
+│   └── style.css           # Tema kuning dominan + dark mode
+├── scripts/
+│   ├── storage.js          # localStorage + import/export JSON
+│   ├── notifications.js    # Toast + Web Notification + reminder
+│   ├── dragdrop.js         # Drag-and-drop dengan placeholder halus
+│   └── app.js              # Controller utama (render, CRUD, events)
+├── assets/
+│   ├── unnes-logo.jpg      # Logo UNNES resmi (dari Wikimedia Commons)
+│   └── favicon.svg         # Favicon kuning
+└── README.md
 ```
-
-Tidak ada build tool, tidak ada framework — murni HTML + CSS + JavaScript. Cukup buka `index.html`.
 
 ---
 
-## Catatan Logo
+## Deploy Sendiri
 
-Logo `assets/unnes-logo.svg` adalah ilustrasi orisinal yang terinspirasi semangat UNNES (perisai + obor pendidikan + buku). Untuk publikasi resmi, ganti dengan logo UNNES resmi sesuai panduan brand kampus.
+### Vercel (Recommended)
+1. Fork/clone repo ini
+2. Buka [vercel.com](https://vercel.com) → Import Git Repository
+3. Pilih repo `moyunice` → Deploy
+4. Selesai — auto-deploy setiap push ke `main`
+
+### GitHub Pages
+1. Fork repo → Settings → Pages → Source: **GitHub Actions**
+2. Workflow otomatis berjalan pada setiap push ke `main`
+3. Akses di `https://<username>.github.io/moyunice/`
+
+### Lokal
+```bash
+git clone https://github.com/mocasus/moyunice.git
+cd moyunice
+# Buka langsung di browser:
+open index.html
+# Atau jalankan server sederhana:
+python3 -m http.server 8080
+```
+
+---
+
+## Kontribusi
+
+Pull request diterima! Beberapa ide pengembangan:
+
+- [ ] Kalender bulanan visual
+- [ ] Ekspor jadwal ke PDF
+- [ ] Integrasi .ics (Google Calendar)
+- [ ] PWA (installable, offline-first)
+- [ ] Statistik per mata kuliah
+- [ ] Tema warna kustom per user
+
+---
+
+## Lisensi
+
+MIT License — bebas digunakan, dimodifikasi, dan didistribusikan.
+
+---
+
+<p align="center">
+  <sub>Dibuat dengan semangat untuk mahasiswa <strong>Universitas Negeri Semarang</strong></sub><br/>
+  <img src="https://img.shields.io/badge/UNNES-Semarang-f5b800?style=flat-square" />
+</p>
