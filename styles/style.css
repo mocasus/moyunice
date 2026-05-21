@@ -696,3 +696,178 @@ kbd {
     color: #000 !important;
   }
 }
+
+
+
+/* =========================================================
+   RESPONSIVE — Mobile (max-width: 640px)
+   ========================================================= */
+@media (max-width: 640px) {
+  /* Topbar: stack vertikal */
+  .topbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+  .brand { gap: 10px; }
+  .brand-logo { width: 44px; height: 44px; }
+  .brand-text h1 { font-size: 20px; }
+  .brand-text p { font-size: 11px; }
+
+  .topbar-actions {
+    gap: 6px;
+    justify-content: center;
+  }
+  .topbar-actions .btn span { display: none; }
+  .topbar-actions .btn { width: 36px; height: 36px; padding: 0; justify-content: center; }
+  .topbar-actions .btn .icon { width: 18px; height: 18px; }
+  .topbar-actions .btn.icon-only { width: 36px; }
+
+  .search-wrap { width: 100%; order: -1; }
+  .search-wrap input { min-width: unset; width: 100%; font-size: 14px; }
+
+  /* Layout: full-width stack */
+  .layout {
+    grid-template-columns: 1fr;
+    padding: 12px 10px 40px;
+    gap: 14px;
+  }
+
+  /* Sidebar: horizontal scroll untuk hari list */
+  .sidebar {
+    max-height: none;
+    overflow: visible;
+    gap: 10px;
+    padding-right: 0;
+  }
+  .sidebar-section { padding: 10px; border-radius: var(--radius-sm); }
+  .day-list {
+    flex-direction: row;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .day-list li {
+    flex: 0 0 auto;
+    min-width: fit-content;
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 2px solid var(--yellow-300);
+    gap: 6px;
+    white-space: nowrap;
+  }
+  .day-list li.active { border-color: var(--yellow-500); background: var(--yellow-200); }
+  .day-list .day-actions { display: none !important; }
+  .day-list .count { display: none; }
+
+  /* Pomodoro: compact */
+  .pomo-display { font-size: 36px; margin: 4px 0 8px; }
+  .pomo-actions { gap: 4px; }
+  .pomo-config { gap: 6px; }
+  .pomo-config input[type="number"] { height: 30px; }
+
+  /* Stats: inline ringkasan */
+  .stats .stat-row { font-size: 12.5px; }
+  .tips { display: none; }
+
+  /* Board */
+  .board-head {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .board-head h2 { font-size: 18px; }
+  .board-actions {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 6px;
+    padding-bottom: 4px;
+  }
+  .board-actions .btn { white-space: nowrap; flex: 0 0 auto; }
+  .board-actions .select { flex: 0 0 auto; min-width: 130px; }
+
+  /* Day columns: full width single column */
+  .day-columns {
+    grid-template-columns: 1fr !important;
+    gap: 10px;
+  }
+  .day-column { padding: 10px; border-radius: var(--radius); min-height: 120px; }
+  .day-column-title h3 { font-size: 15px; }
+
+  /* Course card */
+  .course-card { padding: 10px; gap: 8px; }
+  .course-title { font-size: 14px; }
+  .course-meta { gap: 4px; font-size: 11px; }
+  .course-meta .chip { padding: 2px 6px; }
+  .course-note { font-size: 11.5px; padding: 6px 8px; }
+
+  /* Task items */
+  .task-item { padding: 6px 8px; gap: 6px; }
+  .task-main .title { font-size: 12.5px; }
+  .task-main .sub { font-size: 10.5px; gap: 4px; }
+
+  /* Modal */
+  .modal { padding: 10px; }
+  .modal-card { border-radius: var(--radius); }
+  .modal-card header { padding: 10px 14px; }
+  .modal-card .form, .modal-card .confirm-body { padding: 12px 14px; }
+  .modal-card footer { padding: 10px 14px; }
+  .form-row { grid-template-columns: 1fr; gap: 8px; }
+
+  /* Footer */
+  .footer {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 14px;
+    gap: 4px;
+    font-size: 11.5px;
+  }
+
+  /* Toast */
+  .toast-container {
+    left: 10px; right: 10px; bottom: 10px; max-width: none;
+  }
+  .toast { padding: 10px; border-radius: 10px; }
+
+  /* Shortcut table */
+  .shortcut-table td { padding: 6px 4px; font-size: 12.5px; }
+}
+
+/* =========================================================
+   RESPONSIVE — Tablet kecil (max-width: 768px, min-width: 641px)
+   ========================================================= */
+@media (min-width: 641px) and (max-width: 768px) {
+  .topbar { padding: 12px 16px; }
+  .topbar-actions .btn span { display: none; }
+  .topbar-actions .btn { width: 36px; height: 36px; padding: 0; justify-content: center; }
+  .search-wrap input { min-width: 180px; }
+  .day-columns { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+}
+
+/* =========================================================
+   MOBILE BOTTOM NAV — tombol aksi utama sticky di bawah (HP only)
+   ========================================================= */
+@media (max-width: 640px) {
+  .board-actions {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 25;
+    background: var(--bg-elev);
+    border-top: 2px solid var(--yellow-400);
+    padding: 10px 12px;
+    justify-content: space-between;
+    box-shadow: 0 -4px 14px rgba(122, 75, 0, .12);
+  }
+  .board-actions .btn-primary {
+    flex: 1;
+  }
+  .board-actions .select { flex: 0 0 auto; }
+  /* Kompensasi ruang untuk bottom nav */
+  .board { padding-bottom: 70px; }
+  .footer { padding-bottom: 80px; }
+}
